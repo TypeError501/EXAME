@@ -19,30 +19,17 @@ function cadastrarDados() {
   }
 
   // Concatenar os dados da coluna C7:C11 em uma única linha de até 5 colunas (A até E)
-  // Se precisar preencher as 5 colunas, pode ajustar aqui. Vou preencher da esquerda para direita.
   var dadosParaInserir = [];
 
-  // Pega até 5 valores da lista (se tiver menos, preenche com vazio)
   for (var i = 0; i < 5; i++) {
     dadosParaInserir.push(dadosTabela1[i] ? dadosTabela1[i][0] : "");
   }
 
-  // Encontrar a última linha preenchida na planilha "REGISTRO" a partir da linha 17 na coluna A
-  var colunaA = destino.getRange("A17:A999").getValues();
-  var ultimaLinhaRelativa = 0; // índice relativo dentro do intervalo A17:A999
+  // Insere uma nova linha na posição 17 para empurrar as linhas existentes para baixo
+  destino.insertRowBefore(17);
 
-  for (var i = colunaA.length - 1; i >= 0; i--) {
-    if (colunaA[i][0] !== "" && colunaA[i][0] !== null) {
-      ultimaLinhaRelativa = i + 1;
-      break;
-    }
-  }
-
-  // A linha absoluta para inserir os dados será 17 + ultimaLinhaRelativa
-  var linhaInserir = 17 + ultimaLinhaRelativa;
-
-  // Insere os dados na linha encontrada, colunas A até E
-  destino.getRange(linhaInserir, 1, 1, 5).setValues([dadosParaInserir]);
+  // Agora insere os dados na linha 17, colunas A até E
+  destino.getRange(17, 1, 1, 5).setValues([dadosParaInserir]);
 
   // Apagar os dados da tabela 1 na planilha origem
   origem.getRange("C7:C11").clearContent();
