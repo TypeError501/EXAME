@@ -1,9 +1,9 @@
 function cadastrarDados() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
-  var origem = ss.getActiveSheet();           // Planilha atual (onde estão os dados)
-  var destino = ss.getSheetByName("REGISTRO"); // Planilha "REGISTRO"
+  var origem = ss.getActiveSheet();              // Planilha atual (onde estão os dados)
+  var destino = ss.getSheetByName("REGISTRO");   // Planilha "REGISTRO"
 
-  // Pega os dados da tabela 1 (B7:C11)
+  // Pega os dados da tabela 1 (C7:C11)
   var dadosTabela1 = origem.getRange("C7:C11").getValues();
 
   // Verifica se há dados na tabela 1 (pelo menos uma célula não vazia)
@@ -18,21 +18,34 @@ function cadastrarDados() {
     return;
   }
 
-  // Concatenar os dados da tabela 1 em uma única lista (10 elementos)
-  var dadosConcatenados = [];
-  for (var i = 0; i < dadosTabela1.length; i++) {
-    for (var j = 0; j < dadosTabela1[i].length; j++) {
-      dadosConcatenados.push(dadosTabela1[i][j]);
+  // Concatenar os dados da coluna C7:C11 em uma única linha de até 5 colunas (A até E)
+  // Se precisar preencher as 5 colunas, pode ajustar aqui. Vou preencher da esquerda para direita.
+  var dadosParaInserir = [];
+
+  // Pega até 5 valores da lista (se tiver menos, preenche com vazio)
+  for (var i = 0; i < 5; i++) {
+    dadosParaInserir.push(dadosTabela1[i] ? dadosTabela1[i][0] : "");
+  }
+
+  // Encontrar a última linha preenchida na planilha "REGISTRO" a partir da linha 17 na coluna A
+  var colunaA = destino.getRange("A17:A999").getValues();
+  var ultimaLinhaRelativa = 0; // índice relativo dentro do intervalo A17:A999
+
+  for (var i = colunaA.length - 1; i >= 0; i--) {
+    if (colunaA[i][0] !== "" && colunaA[i][0] !== null) {
+      ultimaLinhaRelativa = i + 1;
+      break;
     }
   }
 
-  // Copiar os primeiros 5 dados para a tabela 2 na planilha REGISTRO (A17:E17)
-  var dadosParaTabela2 = dadosConcatenados.slice(0, 5);
-  destino.getRange("A17:E17").setValues([dadosParaTabela2]);
+  // A linha absoluta para inserir os dados será 17 + ultimaLinhaRelativa
+  var linhaInserir = 17 + ultimaLinhaRelativa;
+
+  // Insere os dados na linha encontrada, colunas A até E
+  destino.getRange(linhaInserir, 1, 1, 5).setValues([dadosParaInserir]);
 
   // Apagar os dados da tabela 1 na planilha origem
   origem.getRange("C7:C11").clearContent();
 
   SpreadsheetApp.getUi().alert("Dados cadastrados com sucesso na planilha REGISTRO!");
 }
-
